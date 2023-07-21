@@ -1,0 +1,2 @@
+SERVER_PORT = 7410
+SERVER_URL = f"http://localhost:{SERVER_PORT}"
