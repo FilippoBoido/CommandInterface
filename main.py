@@ -1,13 +1,10 @@
 import asyncio
-from typing import Optional
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import NestedCompleter
 
-from signal_analyzers.fio_signal_analyzer import FIOSignalAnalyzer
 from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
 from signal_analyzers.tc_signal_analyzer import TCSignalAnalyzer
-from signals.fio_signals import FIOSignalDict
 from signals.generic_signals import SignalDict, Signal
 from signals.tc_signals import TCSignalDict
 
@@ -18,16 +15,14 @@ async def input_controller(queue, signal_dict: SignalDict):
 
         session = PromptSession(completer=completer, multiline=False)
         user_input: str = await session.prompt_async()
-        signal: Optional[Signal] = None
-        for key, value in signal_dict.items():
-            if key in user_input:
-                signal: Signal = value
-                if key != user_input:
-                    signal.payload = user_input.split(key)[1].strip()
-                queue.put_nowait(signal)
+        user_input_list = user_input.split(':')
+        command = user_input_list[0] + ':'
+        if command in signal_dict:
+            signal = signal_dict[command]
+            signal.payload = user_input_list[1]
+            queue.put_nowait(signal)
+            if signal.stop:
                 break
-        if signal and signal.stop:
-            break
 
 
 async def app_loop(queue, signal_analyzer: SignalAnalyzer):

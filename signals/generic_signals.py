@@ -10,7 +10,7 @@ class Signal(ABC):
     payload: Optional[Any] = None
 
 
-_initial_dict = {"Quit": Signal(stop=True)}
+_initial_dict = {"Quit:": Signal(stop=True)}
 
 
 class SignalDict(UserDict):
