@@ -7,6 +7,7 @@ from tabulate import tabulate
 
 from constants import SERVER_URL
 from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
+from signals.fio_signals import FIOSignal
 from signals.generic_signals import Signal
 
 
@@ -31,7 +32,8 @@ class FIOSignalAnalyzer(SignalAnalyzer):
         self.tags = []
 
     async def eval(self, signal: Signal):
-        if signal.tags:
+        fio_signal = FIOSignal(**dataclasses.asdict(signal))
+        if fio_signal.tags:
             async with httpx.AsyncClient() as client:
                 try:
                     response = await client.get(SERVER_URL + '/api/tags')
