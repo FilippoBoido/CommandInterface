@@ -1,9 +1,10 @@
 import dataclasses
 import os
 from dataclasses import dataclass
+from typing import Optional
 
 from prompt_toolkit import print_formatted_text, HTML
-from prompt_toolkit.shortcuts import button_dialog, yes_no_dialog
+from prompt_toolkit.shortcuts import yes_no_dialog
 from pyads import ADSError
 from tabulate import tabulate
 
@@ -90,7 +91,7 @@ class TCSignalAnalyzer(SignalAnalyzer):
         tc_signal = TCSignal(**dataclasses.asdict(signal))
         try:
             if tc_signal.all_symbols:
-
+                ignore_symbols: Optional[list] = None
                 # Get a list of symbols to ignore
                 if os.path.isfile(self._ignore_list_path):
                     with open(self._ignore_list_path, 'r') as ignore_symbols_file:
@@ -99,7 +100,7 @@ class TCSignalAnalyzer(SignalAnalyzer):
                 symbols = self._plc.get_all_symbols()
                 filtered_symbols = []
                 for symbol in symbols:
-                    if symbol.name in ignore_symbols:
+                    if ignore_symbols and symbol.name in ignore_symbols:
                         continue
                     filtered_symbols.append(symbol)
                     if symbol.plc_type:
