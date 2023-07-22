@@ -23,6 +23,7 @@ class Symbol:
     value: None
 
 
+# TODO: Add list of symbols to ignore
 class TCSignalAnalyzer(SignalAnalyzer):
 
     def __init__(self):
@@ -33,27 +34,27 @@ class TCSignalAnalyzer(SignalAnalyzer):
 
     async def eval(self, signal: Signal):
         tc_signal = TCSignal(**dataclasses.asdict(signal))
-        if tc_signal.all_symbols:
-            symbols = self._plc.get_all_symbols()
-            for symbol in symbols:
-                if symbol.plc_type:
-                    symbol.read()
+        try:
+            if tc_signal.all_symbols:
+                symbols = self._plc.get_all_symbols()
+                for symbol in symbols:
+                    if symbol.plc_type:
+                        symbol.read()
 
-            self._symbols = payload_to_dataclass(symbols, Symbol)
+                self._symbols = payload_to_dataclass(symbols, Symbol)
 
-            table = fill_table(self._symbols, Symbol)
-            print(table)
+                table = fill_table(self._symbols, Symbol)
+                print(table)
 
-        elif tc_signal.get_symbol:
-            if signal.payload:
-                symbol_str = signal.payload
-                signal.payload = None
-                try:
+            elif tc_signal.get_symbol:
+                if signal.payload:
+                    symbol_str = signal.payload
+                    signal.payload = None
                     symbol = self._plc.get_symbol(symbol_str)
                     if symbol.plc_type:
                         symbol.read()
                     table_list = payload_to_dataclass([symbol], Symbol)
                     print(fill_table(table_list, Symbol))
 
-                except ADSError as e:
-                    print_formatted_text(HTML(f'<red>ERR: {e}</red>'))
+        except ADSError as e:
+            print_formatted_text(HTML(f'<red>ERR: {e}</red>'))
