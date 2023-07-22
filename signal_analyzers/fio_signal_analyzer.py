@@ -1,3 +1,4 @@
+import dataclasses
 from dataclasses import dataclass
 
 import httpx
@@ -39,10 +40,10 @@ class FIOSignalAnalyzer(SignalAnalyzer):
                         self.tags.clear()
                         for tag in payload:
                             self.tags.append(Tag(**tag))
-                        table_data = [['Name', 'Address', 'Type', 'Value']]
+                        table_data = [[field.name.capitalize() for field in dataclasses.fields(Tag)]]
 
                         for tag in self.tags:
-                            table_data.append([tag.name, tag.address, tag.type, tag.value])
+                            table_data.append([value for value in dataclasses.asdict(tag).values()])
                         print(tabulate(table_data, headers='firstrow'))
                     else:
                         print_formatted_text(
