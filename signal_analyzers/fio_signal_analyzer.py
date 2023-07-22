@@ -6,7 +6,7 @@ from prompt_toolkit import print_formatted_text, HTML
 from tabulate import tabulate
 
 from constants import SERVER_URL
-from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
+from signal_analyzers.generic_signal_analyzers import SignalAnalyzer, fill_table, payload_to_dataclass
 from signals.fio_signals import FIOSignal
 from signals.generic_signals import Signal
 
@@ -39,14 +39,9 @@ class FIOSignalAnalyzer(SignalAnalyzer):
                     response = await client.get(SERVER_URL + '/api/tags')
                     if response.status_code == 200:
                         payload = response.json()
-                        self.tags.clear()
-                        for tag in payload:
-                            self.tags.append(Tag(**tag))
-                        table_data = [[field.name.capitalize() for field in dataclasses.fields(Tag)]]
-
-                        for tag in self.tags:
-                            table_data.append([value for value in dataclasses.asdict(tag).values()])
-                        print(tabulate(table_data, headers='firstrow'))
+                        self.tags = payload_to_dataclass(payload, Tag)
+                        table = fill_table(self.tags, Tag)
+                        print(table)
                     else:
                         print_formatted_text(
                             HTML(f'<red>ERR: Response status code is: {response.status_code}</red>'))
