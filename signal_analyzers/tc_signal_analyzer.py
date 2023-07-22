@@ -26,9 +26,9 @@ class Symbol:
 # TODO: Add list of symbols to ignore
 class TCSignalAnalyzer(SignalAnalyzer):
 
-    def __init__(self):
+    def __init__(self, ams_net_id='127.0.0.1.1.1'):
         super().__init__()
-        self._plc = pyads.Connection('127.0.0.1.1.1', pyads.PORT_TC3PLC1)
+        self._plc = pyads.Connection(ams_net_id, pyads.PORT_TC3PLC1)
         self._plc.open()
         self._symbols = []
 
