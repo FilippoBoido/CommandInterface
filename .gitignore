@@ -1,3 +1,6 @@
 /scartch.py
 /ignore_ads_symbols.txt
 /watchlist.txt
+/env/*
+/.idea/*
+
