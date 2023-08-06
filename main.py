@@ -1,5 +1,7 @@
 import asyncio
+from dataclasses import dataclass
 
+import click
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import NestedCompleter
 
@@ -36,14 +38,23 @@ async def app_loop(queue, signal_analyzer: SignalAnalyzer):
                 break
 
 
-async def main():
+@dataclass
+class ConsoleArgs:
+    ams_net_id: str
+
+
+async def main(args: ConsoleArgs):
     queue = asyncio.Queue()
-    # fio_signal_dict = FIOSignalDict()
-    # fio_signal_analyzer = FIOSignalAnalyzer()
     tc_signal_dict = TCSignalDict()
-    tc_signal_analyzer = TCSignalAnalyzer('192.168.2.115.1.1')
+    tc_signal_analyzer = TCSignalAnalyzer(args.ams_net_id)
     await asyncio.gather(input_controller(queue, tc_signal_dict), app_loop(queue, tc_signal_analyzer))
 
 
+@click.command()
+@click.option('--ams-net-id', default='127.0.0.1.1.1', help='Target AMS Net ID')
+def console_args(ams_net_id):
+    asyncio.run(main(ConsoleArgs(ams_net_id)))
+
+
 if __name__ == '__main__':
-    asyncio.run(main())
+    console_args()
