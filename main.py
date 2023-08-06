@@ -4,9 +4,9 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import NestedCompleter
 
 from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
-from signal_analyzers.tc_signal_analyzer import TCSignalAnalyzer
+from implementations.tc.tc_signal_analyzer import TCSignalAnalyzer
 from signals.generic_signals import SignalDict, Signal
-from signals.tc_signals import TCSignalDict
+from implementations.tc.tc_signals import TCSignalDict
 
 
 async def input_controller(queue, signal_dict: SignalDict):
@@ -41,7 +41,7 @@ async def main():
     # fio_signal_dict = FIOSignalDict()
     # fio_signal_analyzer = FIOSignalAnalyzer()
     tc_signal_dict = TCSignalDict()
-    tc_signal_analyzer = TCSignalAnalyzer()
+    tc_signal_analyzer = TCSignalAnalyzer('192.168.2.115.1.1')
     await asyncio.gather(input_controller(queue, tc_signal_dict), app_loop(queue, tc_signal_analyzer))
 
 

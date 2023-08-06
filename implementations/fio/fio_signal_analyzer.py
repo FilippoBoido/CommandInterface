@@ -3,11 +3,10 @@ from dataclasses import dataclass
 
 import httpx
 from prompt_toolkit import print_formatted_text, HTML
-from tabulate import tabulate
 
 from constants import SERVER_URL
 from signal_analyzers.generic_signal_analyzers import SignalAnalyzer, fill_table, payload_to_dataclass
-from signals.fio_signals import FIOSignal
+from implementations.fio.fio_signals import FIOSignal
 from signals.generic_signals import Signal
 
 

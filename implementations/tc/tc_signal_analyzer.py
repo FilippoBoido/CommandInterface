@@ -12,7 +12,7 @@ from signal_analyzers.generic_signal_analyzers import SignalAnalyzer, fill_table
 from signals.generic_signals import Signal
 import pyads
 
-from signals.tc_signals import TCSignal
+from implementations.tc.tc_signals import TCSignal
 
 
 @dataclass
@@ -29,9 +29,9 @@ class Symbol:
 
 class TCSignalAnalyzer(SignalAnalyzer):
 
-    def __init__(self, ams_net_id='127.0.0.1.1.1'):
+    def __init__(self, ams_net_id='127.0.0.1.1.1', port=pyads.PORT_TC3PLC1):
         super().__init__()
-        self._plc = pyads.Connection(ams_net_id, pyads.PORT_TC3PLC1)
+        self._plc = pyads.Connection(ams_net_id, port)
         self._plc.open()
         self._ignore_list_path = 'ignore_ads_symbols.txt'
         self._watchlist_path = 'watchlist.txt'
