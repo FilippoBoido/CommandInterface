@@ -1,4 +1,5 @@
 import dataclasses
+import datetime
 import os
 from dataclasses import dataclass
 from typing import Optional
@@ -35,6 +36,7 @@ class TCSignalAnalyzer(SignalAnalyzer):
         self._plc.open()
         self._ignore_list_path = 'ignore_ads_symbols.txt'
         self._watchlist_path = 'watchlist.txt'
+        self._notification_dict = {}
 
     def _get_ads_symbol(self, symbol_str):
         symbol = self._plc.get_symbol(symbol_str)
@@ -169,6 +171,26 @@ class TCSignalAnalyzer(SignalAnalyzer):
                     ).run_async()
                     if result:
                         os.remove(self._watchlist_path)
+
+            elif tc_signal.notify:
+                if tc_signal.payload:
+                    symbol_str = self._get_symbol_str(tc_signal)
+                    target_symbol = self._get_ads_symbol(symbol_str)
+
+                    def _timestamp():
+                        current_time = datetime.datetime.now()
+                        timestamp = current_time.strftime("%Y-%m-%d %H:%M:%S")
+                        return timestamp
+
+                    def _callback(notification_header, index_tuple):
+                        print(f"{_timestamp()} Notification received for symbol {target_symbol.name}. "
+                              f"Value changed to: {notification_header.contents.data} "
+                              f"Payload timestamp: {notification_header.contents.nTimeStamp}")
+
+                    if target_symbol.name not in self._notification_dict:
+                        return_val = target_symbol.add_device_notification(_callback)
+                        self._notification_dict[target_symbol.name] = target_symbol
+                        print(f"Notification callback for symbol {target_symbol.name} setup {return_val}")
 
         except ADSError as e:
             print_formatted_text(HTML(f'<red>ERR: {e}</red>'))

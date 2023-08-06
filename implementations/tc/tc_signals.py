@@ -15,10 +15,12 @@ class TCSignal(Signal):
     add_to_watchlist: bool = False
     remove_from_watchlist: bool = False
     clear_watchlist: bool = False
+    notify: bool = False
 
 
 class TCSignalDict(SignalDict):
     def __init__(self):
+        # Remember the ':' symbol after the name of the signal
         self._tc_signals = {
             "All symbols:": TCSignal(all_symbols=True),
             "Get symbol:": TCSignal(get_symbol=True),
@@ -29,6 +31,7 @@ class TCSignalDict(SignalDict):
             "Watchlist:": TCSignal(watchlist=True),
             "Add symbol to watchlist:": TCSignal(add_to_watchlist=True),
             "Remove symbol from watchlist:": TCSignal(remove_from_watchlist=True),
-            "Clear watchlist:": TCSignal(clear_watchlist=True)
+            "Clear watchlist:": TCSignal(clear_watchlist=True),
+            "Notify:": TCSignal(notify=True)
         }
         super().__init__(self._tc_signals)

@@ -1,8 +1,6 @@
 import dataclasses
 from abc import abstractmethod, ABC
-
 from tabulate import tabulate
-
 from signals.generic_signals import Signal
 
 
