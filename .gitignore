@@ -4,3 +4,6 @@
 /env/*
 /.idea/*
 
+/tcexplorer.spec
+/build/*
+/dist/*
