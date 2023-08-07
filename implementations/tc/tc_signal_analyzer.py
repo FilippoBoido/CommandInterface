@@ -89,6 +89,10 @@ class TCSignalAnalyzer(SignalAnalyzer):
                 for symbol_str in rebuilt_list:
                     file.write(symbol_str)
 
+    def cleanup(self):
+        for notification in self._notification_dict.values():
+            notification.clear_device_notifications()
+
     async def eval(self, signal: Signal):
         tc_signal = TCSignal(**dataclasses.asdict(signal))
         try:
@@ -183,14 +187,30 @@ class TCSignalAnalyzer(SignalAnalyzer):
                         return timestamp
 
                     def _callback(notification_header, index_tuple):
-                        print(f"{_timestamp()} Notification received for symbol {target_symbol.name}. "
-                              f"Value changed to: {notification_header.contents.data} "
-                              f"Payload timestamp: {notification_header.contents.nTimeStamp}")
+                        timestamp_microseconds = notification_header.contents.nTimeStamp // 10
+                        # Convert the timestamp to a datetime object
+                        date_time = datetime.datetime(1601, 1, 1) + datetime.timedelta(
+                            microseconds=timestamp_microseconds)
+                        formatted_date_time = date_time.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                        output_string = (
+                            f"{formatted_date_time}: Notification received for symbol {target_symbol.name}. "
+                            f"Value changed to: {notification_header.contents.data}\n")
+                        with open('ADSNotification.txt', 'a') as notification_file:
+                            notification_file.write(output_string)
 
                     if target_symbol.name not in self._notification_dict:
                         return_val = target_symbol.add_device_notification(_callback)
                         self._notification_dict[target_symbol.name] = target_symbol
-                        print(f"Notification callback for symbol {target_symbol.name} setup {return_val}")
+                        print(f"Notification callback for symbol {target_symbol.name} setup successfully {return_val}")
 
+            elif tc_signal.clear_notification:
+                if tc_signal.payload:
+                    symbol_str = self._get_symbol_str(tc_signal)
+                    if symbol_str in self._notification_dict:
+                        self._notification_dict[symbol_str].clear_device_notifications()
+                        del self._notification_dict[symbol_str]
+                        print("Done")
+                    else:
+                        print("Nothing to do")
         except ADSError as e:
             print_formatted_text(HTML(f'<red>ERR: {e}</red>'))

@@ -16,6 +16,7 @@ class TCSignal(Signal):
     remove_from_watchlist: bool = False
     clear_watchlist: bool = False
     notify: bool = False
+    clear_notification: bool = False
 
 
 class TCSignalDict(SignalDict):
@@ -32,6 +33,7 @@ class TCSignalDict(SignalDict):
             "Add symbol to watchlist:": TCSignal(add_to_watchlist=True),
             "Remove symbol from watchlist:": TCSignal(remove_from_watchlist=True),
             "Clear watchlist:": TCSignal(clear_watchlist=True),
-            "Notify:": TCSignal(notify=True)
+            "Notify:": TCSignal(notify=True),
+            "Clear notification:": TCSignal(clear_notification=True)
         }
         super().__init__(self._tc_signals)

@@ -8,6 +8,9 @@ class SignalAnalyzer(ABC):
     @abstractmethod
     async def eval(self, signal: Signal): ...
 
+    @abstractmethod
+    def cleanup(self): ...
+
 
 def payload_to_dataclass(payload: list, dataclass_arg):
     dataclass_list = []
