@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-
 from signals.generic_signals import Signal, SignalDict
 
 
@@ -16,7 +15,12 @@ class TCSignal(Signal):
     remove_from_watchlist: bool = False
     clear_watchlist: bool = False
     notify: bool = False
-    clear_notification: bool = False
+    stop_notification: bool = False
+    notification_list: bool = False
+    add_to_notification_list: bool = False
+    remove_from_notification_list: bool = False
+    clear_notification_list: bool = False
+    stop_notifications: bool = False
 
 
 class TCSignalDict(SignalDict):
@@ -34,6 +38,11 @@ class TCSignalDict(SignalDict):
             "Remove symbol from watchlist:": TCSignal(remove_from_watchlist=True),
             "Clear watchlist:": TCSignal(clear_watchlist=True),
             "Notify:": TCSignal(notify=True),
-            "Clear notification:": TCSignal(clear_notification=True)
+            "Stop notification:": TCSignal(stop_notification=True),
+            "Notification list:": TCSignal(notification_list=True),
+            "Add to notification list:": TCSignal(add_to_notification_list=True),
+            "Remove from notification list:": TCSignal(remove_from_notification_list=True),
+            "Clear notification list:": TCSignal(clear_notification_list=True),
+            "Stop notifications:": TCSignal(stop_notifications=True)
         }
         super().__init__(self._tc_signals)
