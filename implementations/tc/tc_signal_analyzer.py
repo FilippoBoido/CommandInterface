@@ -85,7 +85,6 @@ class TCSignalAnalyzer(SignalAnalyzer):
 
                     if 'STRING' in symbol.symbol_type:
                         symbol_value = notification_dict[symbol.name].value
-                        print(symbol_value)
                         byte_string = b''
                         for byte in symbol_value:
                             if byte == b'\x00':
