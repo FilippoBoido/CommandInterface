@@ -5,7 +5,8 @@ import httpx
 from prompt_toolkit import print_formatted_text, HTML
 
 from implementations.fio.constants import SERVER_URL
-from signal_analyzers.generic_signal_analyzers import SignalAnalyzer, fill_table, payload_to_dataclass
+from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
+from utilities.functions import fill_table, payload_to_dataclass
 from implementations.fio.fio_signals import FIOSignal
 from signals.generic_signals import Signal
 

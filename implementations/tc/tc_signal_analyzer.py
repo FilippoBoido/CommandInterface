@@ -9,7 +9,8 @@ from prompt_toolkit.shortcuts import yes_no_dialog
 from pyads import ADSError
 from tabulate import tabulate
 
-from signal_analyzers.generic_signal_analyzers import SignalAnalyzer, fill_table, payload_to_dataclass
+from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
+from utilities.functions import fill_table, payload_to_dataclass
 from signals.generic_signals import Signal
 import pyads
 
@@ -29,8 +30,8 @@ class Symbol:
 
 
 class TCSignalAnalyzer(SignalAnalyzer):
-
     payload_buffer: dict = {}
+
     def __init__(self, ams_net_id='127.0.0.1.1.1', port=pyads.PORT_TC3PLC1):
         super().__init__()
         self._plc = pyads.Connection(ams_net_id, port)
@@ -103,6 +104,7 @@ class TCSignalAnalyzer(SignalAnalyzer):
                         notification_file.write(output_string)
 
                     TCSignalAnalyzer.payload_buffer[symbol.name] = notification_header
+
                 callback = _notification_callback
 
             return_val = symbol.add_device_notification(callback)
