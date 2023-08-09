@@ -5,7 +5,7 @@ Create your own command console interface thanks to the signal and signal analyz
 ## Quick help for the Twincat implementation used to fetch ADS-Symbols from a Beckhoff PLC Runtime:
 
 1) When creating notifications with the Notification: or Notification list: signal a new ADSNotification.txt file is created.
-2) To ease the live view of the modified ADS Symbol open a powershell on windows and enter: Get-Content -Path "ADSNotification.txt" -Wait
+2) To ease the live view of the modified ADS Symbols open a powershell on windows and enter: Get-Content -Path "ADSNotification.txt" -Wait
 
 ## General help
 
