@@ -8,12 +8,14 @@ from prompt_toolkit.completion import NestedCompleter
 from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
 from implementations.tc.tc_signal_analyzer import TCSignalAnalyzer
 from signals.generic_signals import SignalDict, Signal
-from implementations.tc.tc_signals import TCSignalDict
+from implementations.tc.tc_signals import TCSignalDict, TCSignal
 
 
 async def input_controller(queue, signal_dict: SignalDict):
     while True:
-        completer = NestedCompleter.from_nested_dict(dict([(key, None) for key in signal_dict.keys()]))
+        signal: TCSignal
+        completer_dict = dict([(key, signal.nested_completer_dict) for key, signal in signal_dict.items()])
+        completer = NestedCompleter.from_nested_dict(completer_dict)
 
         session = PromptSession(completer=completer, multiline=False)
         user_input: str = await session.prompt_async()

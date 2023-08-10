@@ -27,6 +27,9 @@ class Tag:
 
 class FIOSignalAnalyzer(SignalAnalyzer):
 
+    def cleanup(self):
+        pass
+
     def __init__(self):
         super().__init__()
         self.tags = []

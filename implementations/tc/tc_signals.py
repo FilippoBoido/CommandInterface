@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from typing import Optional
+
 from signals.generic_signals import Signal, SignalDict
 
 
@@ -6,6 +8,7 @@ from signals.generic_signals import Signal, SignalDict
 class TCSignal(Signal):
     all_symbols: bool = False
     get_symbol: bool = False
+    set_symbol: bool = False
     ignore_list: bool = False
     add_to_ignore: bool = False
     remove_from_ignore: bool = False
@@ -22,6 +25,12 @@ class TCSignal(Signal):
     clear_notification_list: bool = False
     stop_notifications: bool = False
 
+    nested_completer_dict: Optional[dict] = None
+
+
+def symbol_hint() -> dict:
+    ...
+
 
 class TCSignalDict(SignalDict):
     def __init__(self):
@@ -29,6 +38,7 @@ class TCSignalDict(SignalDict):
         self._tc_signals = {
             "All symbols:": TCSignal(all_symbols=True),
             "Get symbol:": TCSignal(get_symbol=True),
+            "Set symbol:": TCSignal(set_symbol=True, nested_completer_dict=symbol_hint()),
             "Ignore list:": TCSignal(ignore_list=True),
             "Add symbol to ignore list:": TCSignal(add_to_ignore=True),
             "Remove symbol from ignore list:": TCSignal(remove_from_ignore=True),
