@@ -1,13 +1,23 @@
 from abc import ABC
 from collections import UserDict
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Optional, Callable
 
 
 @dataclass
 class Signal(ABC):
     stop: bool = False
     payload: Optional[Any] = None
+    nested_completer_func: Optional[Callable[[], dict]] = None
+
+    @property
+    def nested_completer_dict(self) -> Optional[dict]:
+        if self.nested_completer_func:
+            return self.nested_completer_func()
+
+    @nested_completer_dict.setter
+    def nested_completer_dict(self, getter_func: Callable[[], dict]):
+        self.nested_completer_func = getter_func
 
 
 _initial_dict = {"Quit:": Signal(stop=True)}
