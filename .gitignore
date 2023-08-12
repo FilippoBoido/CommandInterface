@@ -7,6 +7,6 @@
 /tcexplorer.spec
 /build/*
 /dist/*
-/ADSNotification.txt
+/ADSNotifications.txt
 /notification_list.txt
 /symbol_hint_file.txt

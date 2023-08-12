@@ -18,7 +18,8 @@ class TCSignal(Signal):
     clear_watchlist: bool = False
     notify: bool = False
     stop_notification: bool = False
-    notification_list: bool = False
+    start_notifications: bool = False
+    show_notifications: bool =False
     add_to_notification_list: bool = False
     remove_from_notification_list: bool = False
     clear_notification_list: bool = False
@@ -44,7 +45,8 @@ class TCSignalDict(SignalDict):
             "ClearWatchlist": TCSignal(clear_watchlist=True),
             "Notify": TCSignal(notify=True, nested_completer_func=symbol_hint),
             "StopNotification": TCSignal(stop_notification=True),
-            "NotificationList": TCSignal(notification_list=True),
+            "StartNotifications": TCSignal(start_notifications=True),
+            "ShowNotifications": TCSignal(show_notifications=True),
             "AddToNotificationList": TCSignal(add_to_notification_list=True, nested_completer_func=symbol_hint),
             "RemoveFromNotificationList": TCSignal(remove_from_notification_list=True),
             "ClearNotificationList": TCSignal(clear_notification_list=True),

@@ -16,6 +16,7 @@ from signals.generic_signals import Signal
 import pyads
 
 from implementations.tc.tc_signals import TCSignal
+from utilities.functions import show_notifications
 
 
 class TCSignalAnalyzer(SignalAnalyzer):
@@ -155,13 +156,18 @@ class TCSignalAnalyzer(SignalAnalyzer):
                     else:
                         print("Nothing to do")
 
-            elif tc_signal.notification_list:
+            elif tc_signal.start_notifications:
                 if os.path.isfile(constants.NOTIFICATION_FILE_PATH):
                     notification_list = get_list_from_file(constants.NOTIFICATION_FILE_PATH)
                     if notification_list:
                         for notification_str in notification_list:
                             symbol = get_ads_symbol(self._plc, notification_str)
                             add_notification(symbol, notification_dict=self._notification_dict)
+                else:
+                    print(f"Nothing to do: No file {constants.NOTIFICATION_FILE_PATH} found.")
+
+            elif tc_signal.show_notifications:
+                show_notifications(file_path=constants.ADS_NOTIFICATIONS)
 
             elif tc_signal.add_to_notification_list:
                 if signal.payload:

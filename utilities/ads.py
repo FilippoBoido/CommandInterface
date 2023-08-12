@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from pyads import Connection
 
+from implementations.tc import constants
 from signals.generic_signals import Signal
 from utilities.functions import payload_to_dataclass, fill_table
 
@@ -93,7 +94,7 @@ def add_notification(symbol, notification_dict, callback=None):
                     f"{formatted_date_time}: Notification received for symbol {symbol.name}. "
                     f"Value changed to: {payload}\n")
 
-                with open('ADSNotification.txt', 'a') as notification_file:
+                with open(constants.ADS_NOTIFICATIONS, 'a') as notification_file:
                     notification_file.write(output_string)
 
             callback = _notification_callback

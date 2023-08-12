@@ -1,11 +1,21 @@
 import dataclasses
+import os
+from multiprocessing import Process
+from pathlib import Path
+
 from typing import Optional
 
+import keyboard
+import tailer
 from tabulate import tabulate
 
 from implementations.tc import constants
 from utilities.file import get_list_from_file
 
+
+def do_tail(file_path):
+    for line in tailer.follow(open(file_path), 0.1):
+        print(line)
 
 def payload_to_dataclass(payload: list, dataclass_arg):
     dataclass_list = []
@@ -24,6 +34,18 @@ def fill_table(elem_list: list, dataclass_arg) -> str:
     for elem in elem_list:
         table_data.append([value for value in dataclasses.asdict(elem).values()])
     return tabulate(table_data, headers='firstrow')
+
+
+def show_notifications(file_path):
+    if not os.path.isfile(file_path):
+        file_path = Path(file_path)
+        file_path.touch()
+
+    process = Process(target=do_tail, daemon=True, args=(file_path, ))
+    process.start()
+    print("Press esc to stop showing notifications.")
+    keyboard.wait("esc")
+    process.terminate()
 
 
 def symbol_hint() -> Optional[dict]:
