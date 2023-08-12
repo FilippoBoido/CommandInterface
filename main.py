@@ -17,13 +17,14 @@ async def input_controller(queue, signal_dict: SignalDict):
         completer_dict = dict([(key, signal.nested_completer_dict) for key, signal in signal_dict.items()])
         completer = NestedCompleter.from_nested_dict(completer_dict)
 
-        session = PromptSession(completer=completer, multiline=False)
+        session = PromptSession(completer=completer)
         user_input: str = await session.prompt_async()
-        user_input_list = user_input.split(':')
-        command = user_input_list[0] + ':'
+        user_input_list = user_input.split(' ')
+        command = user_input_list[0]
+        del user_input_list[0]
         if command in signal_dict:
             signal = signal_dict[command]
-            signal.payload = user_input_list[1]
+            signal.payload = user_input_list
             queue.put_nowait(signal)
             if signal.stop:
                 break

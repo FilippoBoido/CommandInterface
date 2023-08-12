@@ -1,12 +1,11 @@
 from dataclasses import dataclass
-from implementations.tc import constants
 from signals.generic_signals import Signal, SignalDict
-from utilities.functions import get_list_from_file
+from utilities.functions import symbol_hint
 
 
 @dataclass
 class TCSignal(Signal):
-    all_symbols: bool = False
+    get_all_symbols: bool = False
     get_symbol: bool = False
     set_symbol: bool = False
     ignore_list: bool = False
@@ -24,34 +23,34 @@ class TCSignal(Signal):
     remove_from_notification_list: bool = False
     clear_notification_list: bool = False
     stop_notifications: bool = False
-
-
-def symbol_hint() -> dict:
-    hints = get_list_from_file(constants.SYMBOL_HINT_FILE_PATH)
-    return dict([(entry, None) for entry in hints])
+    add_to_hint_list: bool = False
+    remove_from_hint_list: bool = False
+    clear_hint_list: bool = False
 
 
 class TCSignalDict(SignalDict):
     def __init__(self):
-        # Remember the ':' symbol after the name of the signal
         self._tc_signals = {
-            "All symbols:": TCSignal(all_symbols=True),
-            "Get symbol:": TCSignal(get_symbol=True),
-            "Set symbol:": TCSignal(set_symbol=True, nested_completer_func=symbol_hint),
-            "Ignore list:": TCSignal(ignore_list=True),
-            "Add symbol to ignore list:": TCSignal(add_to_ignore=True),
-            "Remove symbol from ignore list:": TCSignal(remove_from_ignore=True),
-            "Clear ignore list:": TCSignal(clear_ignore_list=True),
-            "Watchlist:": TCSignal(watchlist=True),
-            "Add symbol to watchlist:": TCSignal(add_to_watchlist=True),
-            "Remove symbol from watchlist:": TCSignal(remove_from_watchlist=True),
-            "Clear watchlist:": TCSignal(clear_watchlist=True),
-            "Notify:": TCSignal(notify=True),
-            "Stop notification:": TCSignal(stop_notification=True),
-            "Notification list:": TCSignal(notification_list=True),
-            "Add to notification list:": TCSignal(add_to_notification_list=True),
-            "Remove from notification list:": TCSignal(remove_from_notification_list=True),
-            "Clear notification list:": TCSignal(clear_notification_list=True),
-            "Stop notifications:": TCSignal(stop_notifications=True)
+            "GetAllSymbols": TCSignal(get_all_symbols=True),
+            "GetSymbol": TCSignal(get_symbol=True, nested_completer_func=symbol_hint),
+            "SetSymbol": TCSignal(set_symbol=True, nested_completer_func=symbol_hint),
+            "IgnoreList": TCSignal(ignore_list=True),
+            "AddToIgnore": TCSignal(add_to_ignore=True),
+            "RemoveFromIgnore": TCSignal(remove_from_ignore=True),
+            "ClearIgnoreList": TCSignal(clear_ignore_list=True),
+            "Watchlist": TCSignal(watchlist=True),
+            "AddToWatchlist": TCSignal(add_to_watchlist=True),
+            "RemoveFromWatchlist": TCSignal(remove_from_watchlist=True),
+            "ClearWatchlist": TCSignal(clear_watchlist=True),
+            "Notify": TCSignal(notify=True),
+            "StopNotification": TCSignal(stop_notification=True),
+            "NotificationList": TCSignal(notification_list=True),
+            "AddToNotificationList": TCSignal(add_to_notification_list=True),
+            "RemoveFromNotificationList": TCSignal(remove_from_notification_list=True),
+            "ClearNotificationList": TCSignal(clear_notification_list=True),
+            "StopNotifications": TCSignal(stop_notifications=True),
+            "AddToHintList": TCSignal(add_to_hint_list=True),
+            "RemoveFromHintList": TCSignal(remove_from_hint_list=True),
+            "ClearHintList": TCSignal(clear_hint_list=True)
         }
         super().__init__(self._tc_signals)

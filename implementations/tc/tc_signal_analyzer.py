@@ -9,8 +9,9 @@ from tabulate import tabulate
 
 from implementations.tc import constants
 from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
-from utilities.ads import print_out_symbols, get_symbol_str, print_out_symbol, get_ads_symbol, add_notification
-from utilities.functions import add_to_file, remove_from_file, get_list_from_file
+from utilities.ads import print_out_symbols, get_symbol_str, print_out_symbol, get_ads_symbol, add_notification, \
+    set_symbol
+from utilities.file import get_list_from_file, add_to_file, remove_from_file
 from signals.generic_signals import Signal
 import pyads
 
@@ -23,9 +24,6 @@ class TCSignalAnalyzer(SignalAnalyzer):
         super().__init__()
         self._plc = pyads.Connection(ams_net_id, port)
         self._plc.open()
-        self._ignore_list_path = constants.IGNORE_ADS_SYMBOLS_FILE_PATH
-        self._watchlist_path = constants.WATCHLIST_FILE_PATH
-        self._notification_list_path = constants.NOTIFICATION_FILE_PATH
         self._notification_dict = {}
 
     def cleanup(self):
@@ -35,14 +33,16 @@ class TCSignalAnalyzer(SignalAnalyzer):
     async def eval(self, signal: Signal):
         tc_signal = TCSignal(**dataclasses.asdict(signal))
         try:
-            if tc_signal.all_symbols:
-                ignore_symbols: Optional[list] = get_list_from_file(self._ignore_list_path)
-
+            if tc_signal.get_all_symbols:
+                ignore_symbols: Optional[list] = get_list_from_file(constants.IGNORE_ADS_SYMBOLS_FILE_PATH)
+                hint_symbols: Optional[list] = get_list_from_file(constants.SYMBOL_HINT_FILE_PATH)
                 symbols = self._plc.get_all_symbols()
+                
                 filtered_symbols = []
                 for symbol in symbols:
                     if ignore_symbols and symbol.name in ignore_symbols:
                         continue
+                    add_to_file(constants.SYMBOL_HINT_FILE_PATH, symbol.name)
                     filtered_symbols.append(symbol)
                     if symbol.plc_type:
                         symbol.read()
@@ -54,36 +54,45 @@ class TCSignalAnalyzer(SignalAnalyzer):
                     symbol_str = get_symbol_str(signal)
                     print_out_symbol(self._plc, symbol_str)
 
+            elif tc_signal.set_symbol:
+                if signal.payload and len(signal.payload) > 1:
+                    symbol_str = signal.payload[0]
+                    value = signal.payload[1]
+                    set_symbol(self._plc, symbol_str, value)
+                    print_out_symbol(self._plc, symbol_str)
+
             elif tc_signal.add_to_ignore:
                 if signal.payload:
                     symbol_str = get_symbol_str(signal)
-                    add_to_file(self._ignore_list_path, symbol_str)
+                    add_to_file(constants.IGNORE_ADS_SYMBOLS_FILE_PATH, symbol_str)
 
             elif tc_signal.add_to_watchlist:
                 if signal.payload:
                     symbol_str = get_symbol_str(signal)
-                    add_to_file(self._watchlist_path, symbol_str)
+                    add_to_file(constants.WATCHLIST_FILE_PATH, symbol_str)
+                    add_to_file(constants.SYMBOL_HINT_FILE_PATH, symbol_str)
                     print_out_symbol(self._plc, symbol_str)
 
             elif tc_signal.remove_from_ignore:
                 if signal.payload:
                     symbol_str = get_symbol_str(signal)
-                    remove_from_file(self._ignore_list_path, symbol_str)
+                    remove_from_file(constants.IGNORE_ADS_SYMBOLS_FILE_PATH, symbol_str)
+                    add_to_file(constants.SYMBOL_HINT_FILE_PATH, symbol_str)
 
             elif tc_signal.remove_from_watchlist:
                 if signal.payload:
                     symbol_str = get_symbol_str(signal)
-                    remove_from_file(self._watchlist_path, symbol_str)
+                    remove_from_file(constants.WATCHLIST_FILE_PATH, symbol_str)
 
             elif tc_signal.ignore_list:
-                if os.path.isfile(self._ignore_list_path):
-                    ignore_list = get_list_from_file(self._ignore_list_path)
+                if os.path.isfile(constants.IGNORE_ADS_SYMBOLS_FILE_PATH):
+                    ignore_list = get_list_from_file(constants.IGNORE_ADS_SYMBOLS_FILE_PATH)
                     tabulate_data = [[value] for value in ignore_list]
                     print(tabulate(tabulate_data, headers=['ADS Symbols in ignore list']))
 
             elif tc_signal.watchlist:
-                if os.path.isfile(self._watchlist_path):
-                    watchlist = get_list_from_file(self._watchlist_path)
+                if os.path.isfile(constants.WATCHLIST_FILE_PATH):
+                    watchlist = get_list_from_file(constants.WATCHLIST_FILE_PATH)
                     if watchlist:
                         watchlist_symbols = []
                         for watchlist_symbol in watchlist:
@@ -91,23 +100,43 @@ class TCSignalAnalyzer(SignalAnalyzer):
                             watchlist_symbols.append(symbol)
                         print_out_symbols(watchlist_symbols)
 
-            elif tc_signal.clear_ignore_list:
-                if os.path.isfile(self._ignore_list_path):
+            elif tc_signal.add_to_hint_list:
+                if signal.payload:
+                    symbol_str = get_symbol_str(signal)
+                    add_to_file(constants.SYMBOL_HINT_FILE_PATH, symbol_str)
+                    print_out_symbol(self._plc, symbol_str)
+
+            elif tc_signal.remove_from_hint_list:
+                if signal.payload:
+                    symbol_str = get_symbol_str(signal)
+                    remove_from_file(constants.SYMBOL_HINT_FILE_PATH, symbol_str)
+
+            elif tc_signal.clear_hint_list:
+                if os.path.isfile(constants.SYMBOL_HINT_FILE_PATH):
                     result = await yes_no_dialog(
-                        title='Clear Ignore list',
+                        title='Clear hint list',
+                        text='Are you sure you want to clear the hint list?',
+                    ).run_async()
+                    if result:
+                        os.remove(constants.SYMBOL_HINT_FILE_PATH)
+
+            elif tc_signal.clear_ignore_list:
+                if os.path.isfile(constants.IGNORE_ADS_SYMBOLS_FILE_PATH):
+                    result = await yes_no_dialog(
+                        title='Clear ignore list',
                         text='Are you sure you want to clear the ignore list?',
                     ).run_async()
                     if result:
-                        os.remove(self._ignore_list_path)
+                        os.remove(constants.IGNORE_ADS_SYMBOLS_FILE_PATH)
 
             elif tc_signal.clear_watchlist:
-                if os.path.isfile(self._watchlist_path):
+                if os.path.isfile(constants.WATCHLIST_FILE_PATH):
                     result = await yes_no_dialog(
-                        title='Clear Watchlist',
-                        text='Are you sure you want to clear the Watchlist?',
+                        title='Clear watchlist',
+                        text='Are you sure you want to clear the watchlist?',
                     ).run_async()
                     if result:
-                        os.remove(self._watchlist_path)
+                        os.remove(constants.WATCHLIST_FILE_PATH)
 
             elif tc_signal.notify:
                 if tc_signal.payload:
@@ -127,8 +156,8 @@ class TCSignalAnalyzer(SignalAnalyzer):
                         print("Nothing to do")
 
             elif tc_signal.notification_list:
-                if os.path.isfile(self._notification_list_path):
-                    notification_list = get_list_from_file(self._notification_list_path)
+                if os.path.isfile(constants.NOTIFICATION_FILE_PATH):
+                    notification_list = get_list_from_file(constants.NOTIFICATION_FILE_PATH)
                     if notification_list:
                         for notification_str in notification_list:
                             symbol = get_ads_symbol(self._plc, notification_str)
@@ -137,25 +166,26 @@ class TCSignalAnalyzer(SignalAnalyzer):
             elif tc_signal.add_to_notification_list:
                 if signal.payload:
                     symbol_str = get_symbol_str(signal)
-                    add_to_file(self._notification_list_path, symbol_str)
+                    add_to_file(constants.NOTIFICATION_FILE_PATH, symbol_str)
+                    add_to_file(constants.SYMBOL_HINT_FILE_PATH, symbol_str)
 
             elif tc_signal.remove_from_notification_list:
                 if signal.payload:
                     symbol_str = get_symbol_str(signal)
-                    remove_from_file(self._notification_list_path, symbol_str)
+                    remove_from_file(constants.NOTIFICATION_FILE_PATH, symbol_str)
 
             elif tc_signal.clear_notification_list:
-                if os.path.isfile(self._notification_list_path):
+                if os.path.isfile(constants.NOTIFICATION_FILE_PATH):
                     result = await yes_no_dialog(
-                        title='Clear Watchlist',
-                        text='Are you sure you want to clear the Watchlist?',
+                        title='Clear notification list',
+                        text='Are you sure you want to clear the notification list?',
                     ).run_async()
                     if result:
-                        os.remove(self._notification_list_path)
+                        os.remove(constants.NOTIFICATION_FILE_PATH)
 
             elif tc_signal.stop_notifications:
-                if os.path.isfile(self._notification_list_path):
-                    notification_list = get_list_from_file(self._notification_list_path)
+                if os.path.isfile(constants.NOTIFICATION_FILE_PATH):
+                    notification_list = get_list_from_file(constants.NOTIFICATION_FILE_PATH)
                     if notification_list:
                         for notification in notification_list:
                             if notification in self._notification_dict:

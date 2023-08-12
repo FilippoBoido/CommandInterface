@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
+from pyads import Connection
+
 from signals.generic_signals import Signal
 from utilities.functions import payload_to_dataclass, fill_table
 
@@ -17,7 +19,7 @@ class Symbol:
     value: None
 
 
-def get_ads_symbol(plc, symbol_str):
+def get_ads_symbol(plc: Connection, symbol_str):
     symbol = plc.get_symbol(symbol_str)
     if symbol.plc_type:
         symbol.read()
@@ -25,7 +27,7 @@ def get_ads_symbol(plc, symbol_str):
     return symbol
 
 
-def print_out_symbol(plc, symbol_str):
+def print_out_symbol(plc: Connection, symbol_str):
     symbol = get_ads_symbol(plc, symbol_str)
     table_list = payload_to_dataclass([symbol], Symbol)
     table = fill_table(table_list, Symbol)
@@ -38,10 +40,30 @@ def print_out_symbols(symbols):
     print(table)
 
 
-def get_symbol_str(signal: Signal):
-    symbol_str = signal.payload
+def get_symbol_str(signal: Signal) -> str:
+    symbol_str = signal.payload[0]
     signal.payload = None
     return symbol_str
+
+
+def set_symbol(plc: Connection, symbol_str, value):
+    def is_float(s):
+        try:
+            float(s)
+            return True
+        except ValueError:
+            return False
+
+    def is_numeric(s):
+        s = s.replace("-", "")
+        return s.isnumeric()
+
+    if is_numeric(value):
+        value = int(value)
+    elif is_float(value):
+        value = float(value)
+
+    plc.write_by_name(symbol_str, value)
 
 
 def add_notification(symbol, notification_dict, callback=None):
