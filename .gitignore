@@ -8,3 +8,5 @@
 /build/*
 /dist/*
 /ADSNotification.txt
+/notification_list.txt
+/symbol_hint_file.txt
