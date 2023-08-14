@@ -9,13 +9,14 @@ import keyboard
 import tailer
 from tabulate import tabulate
 
-from implementations.tc import constants
+from implementations.tc.data_classes import Paths
 from utilities.file import get_list_from_file
 
 
 def do_tail(file_path):
     for line in tailer.follow(open(file_path), 0.1):
         print(line)
+
 
 def payload_to_dataclass(payload: list, dataclass_arg):
     dataclass_list = []
@@ -41,14 +42,14 @@ def show_notifications(file_path):
         file_path = Path(file_path)
         file_path.touch()
 
-    process = Process(target=do_tail, daemon=True, args=(file_path, ))
+    process = Process(target=do_tail, daemon=True, args=(file_path,))
     process.start()
     print("Press esc to stop showing notifications.")
     keyboard.wait("esc")
     process.terminate()
 
 
-def symbol_hint() -> Optional[dict]:
-    hints = get_list_from_file(constants.SYMBOL_HINT_FILE_PATH)
+def symbol_hint(paths: Paths) -> Optional[dict]:
+    hints = get_list_from_file(paths.symbol_hints_file_path)
     if hints:
         return dict([(entry, None) for entry in hints])

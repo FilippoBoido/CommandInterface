@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from pyads import Connection
 
-from implementations.tc import constants
+from implementations.tc.data_classes import Paths
 from signals.generic_signals import Signal
 from utilities.functions import payload_to_dataclass, fill_table
 
@@ -19,7 +19,9 @@ class Symbol:
     index_offset: int
     value: None
 
-
+    def __post_init__(self):
+        self.index_group = hex(self.index_group)
+        self.index_offset = hex(self.index_offset)
 def get_ads_symbol(plc: Connection, symbol_str):
     symbol = plc.get_symbol(symbol_str)
     if symbol.plc_type:
@@ -67,7 +69,7 @@ def set_symbol(plc: Connection, symbol_str, value):
     plc.write_by_name(symbol_str, value)
 
 
-def add_notification(symbol, notification_dict, callback=None):
+def add_notification(symbol, notification_dict, paths: Paths, callback=None):
     if symbol.name not in notification_dict:
         symbol.auto_update = True
         if not callback:
@@ -94,7 +96,7 @@ def add_notification(symbol, notification_dict, callback=None):
                     f"{formatted_date_time}: Notification received for symbol {symbol.name}. "
                     f"Value changed to: {payload}\n")
 
-                with open(constants.ADS_NOTIFICATIONS, 'a') as notification_file:
+                with open(paths.ads_notifications_file_path, 'a') as notification_file:
                     notification_file.write(output_string)
 
             callback = _notification_callback

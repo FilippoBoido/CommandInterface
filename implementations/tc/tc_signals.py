@@ -27,6 +27,7 @@ class TCSignal(Signal):
     add_to_hint_list: bool = False
     remove_from_hint_list: bool = False
     clear_hint_list: bool = False
+    rpc: bool = False
 
 
 class TCSignalDict(SignalDict):
@@ -53,6 +54,7 @@ class TCSignalDict(SignalDict):
             "StopNotifications": TCSignal(stop_notifications=True),
             "AddToHintList": TCSignal(add_to_hint_list=True),
             "RemoveFromHintList": TCSignal(remove_from_hint_list=True),
-            "ClearHintList": TCSignal(clear_hint_list=True)
+            "ClearHintList": TCSignal(clear_hint_list=True),
+            "RPC": TCSignal(rpc=True)
         }
         super().__init__(self._tc_signals)
