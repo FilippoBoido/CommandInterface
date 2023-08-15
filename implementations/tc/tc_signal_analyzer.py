@@ -30,25 +30,7 @@ class TCSignalAnalyzer(SignalAnalyzer):
     def __init__(self, args: ConsoleArgs, port=pyads.PORT_TC3PLC1):
         super().__init__()
         self._paths: Optional[Paths] = None
-        if args.path_config:
-            config = configparser.ConfigParser()
-            if config.read(args.path_config) and Paths.conf_file_path_section in config:
-                self._paths = Paths(
-                    ignore_ads_symbols_file_path=config[Paths.conf_file_path_section]
-                    [Paths.conf_file_ignore_ads_symbols],
-                    symbol_hints_file_path=config[Paths.conf_file_path_section]
-                    [Paths.conf_file_symbol_hints],
-                    watchlist_file_path=config[Paths.conf_file_path_section]
-                    [Paths.conf_file_watchlist],
-                    notification_symbols_file_path=config[Paths.conf_file_path_section]
-                    [Paths.conf_file_notification_symbols],
-                    ads_notifications_file_path=config[Paths.conf_file_path_section]
-                    [Paths.conf_file_ads_notifications]
-                )
-
-        else:
-            self._paths = Paths()
-
+        self._paths = Paths(args.path_config)
         self._plc = pyads.Connection(args.ams_net_id, port)
         self._plc.open()
         self._notification_dict = {}

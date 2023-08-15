@@ -1,3 +1,4 @@
+import configparser
 from dataclasses import dataclass
 from typing import ClassVar
 
@@ -10,11 +11,7 @@ class ConsoleArgs:
 
 @dataclass
 class Paths:
-    ignore_ads_symbols_file_path: str = ''
-    symbol_hints_file_path: str = ''
-    watchlist_file_path: str = ''
-    notification_symbols_file_path: str = ''
-    ads_notifications_file_path: str = ''
+    path_to_config_file: str = ''
 
     conf_file_path_section: ClassVar[str] = 'app.paths'
     conf_file_ignore_ads_symbols: ClassVar[str] = 'ignore_ads_symbols'
@@ -30,17 +27,24 @@ class Paths:
     default_ads_notifications_file_path: ClassVar[str] = 'ADSNotifications.txt'
 
     def __post_init__(self):
-        self.ignore_ads_symbols_file_path = self.set_file_path(self.ignore_ads_symbols_file_path,
-                                                               self.default_ignore_ads_symbols_file_path)
-        self.symbol_hints_file_path = self.set_file_path(self.symbol_hints_file_path,
-                                                         self.default_symbol_hints_file_path)
-        self.watchlist_file_path = self.set_file_path(self.watchlist_file_path,
-                                                      self.default_watchlist_file_path)
-        self.notification_symbols_file_path = self.set_file_path(self.notification_symbols_file_path,
-                                                                 self.default_notification_symbols_file_path)
-        self.ads_notifications_file_path = self.set_file_path(self.ads_notifications_file_path,
-                                                              self.default_ads_notifications_file_path)
+        config = configparser.ConfigParser()
+        config.read(self.path_to_config_file)
+        self.ignore_ads_symbols_file_path = self._set_file_path(
+            config[Paths.conf_file_path_section][Paths.conf_file_ignore_ads_symbols],
+            self.default_ignore_ads_symbols_file_path)
+        self.symbol_hints_file_path = self._set_file_path(
+            config[Paths.conf_file_path_section][Paths.conf_file_symbol_hints],
+            self.default_symbol_hints_file_path)
+        self.watchlist_file_path = self._set_file_path(
+            config[Paths.conf_file_path_section][Paths.conf_file_watchlist],
+            self.default_watchlist_file_path)
+        self.notification_symbols_file_path = self._set_file_path(
+            config[Paths.conf_file_path_section][Paths.conf_file_notification_symbols],
+            self.default_notification_symbols_file_path)
+        self.ads_notifications_file_path = self._set_file_path(
+            config[Paths.conf_file_path_section][Paths.conf_file_ads_notifications],
+            self.default_ads_notifications_file_path)
 
     @staticmethod
-    def set_file_path(config_file_path: str, default_file_path: str) -> str:
+    def _set_file_path(config_file_path: str, default_file_path: str) -> str:
         return default_file_path if not config_file_path else config_file_path
