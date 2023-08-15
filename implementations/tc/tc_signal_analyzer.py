@@ -29,7 +29,6 @@ class TCSignalAnalyzer(SignalAnalyzer):
 
     def __init__(self, args: ConsoleArgs, port=pyads.PORT_TC3PLC1):
         super().__init__()
-        self._paths: Optional[Paths] = None
         self._paths = Paths(args.path_config)
         self._plc = pyads.Connection(args.ams_net_id, port)
         self._plc.open()
