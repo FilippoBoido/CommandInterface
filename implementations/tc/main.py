@@ -4,7 +4,7 @@ import click
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import NestedCompleter
 
-from implementations.tc.data_classes import ConsoleArgs
+from implementations.tc.data_classes import ConsoleArgs, Paths
 from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
 from implementations.tc.tc_signal_analyzer import TCSignalAnalyzer
 from signals.generic_signals import SignalDict, Signal
@@ -49,9 +49,13 @@ async def main(args: ConsoleArgs):
 
 
 @click.command()
-@click.option('--ams-net-id', default='127.0.0.1.1.1', help='Target AMS Net ID')
+@click.option('--ams-net-id',  default='127.0.0.1.1.1', help='Target AMS Net ID')
 @click.option('--config-path', default='', help='Optional path to a configuration file')
-def console_args(ams_net_id, config_path):
+@click.option("--write-default-config", is_flag=True, default=False, help='Create a default config file')
+def console_args(ams_net_id, config_path, write_default_config):
+    if write_default_config:
+        Paths.write_default_config_file()
+        config_path = Paths.default_config_file_path
     asyncio.run(main(ConsoleArgs(ams_net_id, config_path)))
 
 

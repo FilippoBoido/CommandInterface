@@ -25,6 +25,7 @@ class Paths:
     default_watchlist_file_path: ClassVar[str] = 'watchlist.txt'
     default_notification_symbols_file_path: ClassVar[str] = 'notification_list.txt'
     default_ads_notifications_file_path: ClassVar[str] = 'ADSNotifications.txt'
+    default_config_file_path: ClassVar[str] = 'config.ini'
 
     def __post_init__(self):
         config = configparser.ConfigParser()
@@ -48,3 +49,16 @@ class Paths:
     @staticmethod
     def _set_file_path(config_file_path: str, default_file_path: str) -> str:
         return default_file_path if not config_file_path else config_file_path
+
+    @staticmethod
+    def write_default_config_file():
+        config = configparser.ConfigParser()
+        config[Paths.conf_file_path_section] = {
+            Paths.conf_file_ignore_ads_symbols: Paths.default_ignore_ads_symbols_file_path,
+            Paths.conf_file_symbol_hints: Paths.default_symbol_hints_file_path,
+            Paths.conf_file_watchlist: Paths.default_watchlist_file_path,
+            Paths.conf_file_notification_symbols: Paths.default_notification_symbols_file_path,
+            Paths.conf_file_ads_notifications: Paths.default_ads_notifications_file_path,
+        }
+        with open(Paths.default_config_file_path, 'w') as configfile:
+            config.write(configfile)
