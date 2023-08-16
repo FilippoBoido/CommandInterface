@@ -1,6 +1,8 @@
 import json
 import os
 
+from typing import Optional
+
 
 def get_list_from_file_object(file_obj):
     return file_obj.read().strip().split('\n')
@@ -39,7 +41,7 @@ def remove_from_file(path_to_file, str_to_remove):
                 file.write(symbol_str)
 
 
-def get_json_dict(path_to_file)->dict:
+def get_json(path_to_file) -> Optional[dict]:
     if os.path.isfile(path_to_file):
         with open(path_to_file, 'r') as file:
             return json.load(file)

@@ -1,0 +1,17 @@
+[
+	{
+		"symbol_path": "MAIN.fbTestRun",
+		"methods": [
+			{
+				"name": "rpcMethod1",
+				"argument_types": [ "bool", "bool"],
+				"return_types": ["int", "int"]
+			},
+			{
+				"name": "rpcMethod2",
+				"argument_types": [ "bool", "bool"],
+				"return_types": ["int", "int"]
+			}
+		]
+	}
+]

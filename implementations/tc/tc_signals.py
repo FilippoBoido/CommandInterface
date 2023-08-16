@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from implementations.tc.data_classes import Paths
 from signals.generic_signals import Signal, SignalDict
-from utilities.functions import symbol_hint_callback
+from utilities.functions import symbol_hint_callback, rpc_hint_callback
 
 
 @dataclass
@@ -32,7 +32,6 @@ class TCSignal(Signal):
     rpc: bool = False
 
 
-
 class TCSignalDict(SignalDict):
     def __init__(self, paths: Paths):
         self._tc_signals = {
@@ -51,13 +50,14 @@ class TCSignalDict(SignalDict):
             "StopNotification": TCSignal(stop_notification=True),
             "StartNotifications": TCSignal(start_notifications=True),
             "ShowNotifications": TCSignal(show_notifications=True),
-            "AddToNotificationList": TCSignal(add_to_notification_list=True, nested_completer_func=symbol_hint_callback(paths)),
+            "AddToNotificationList": TCSignal(add_to_notification_list=True,
+                                              nested_completer_func=symbol_hint_callback(paths)),
             "RemoveFromNotificationList": TCSignal(remove_from_notification_list=True),
             "ClearNotificationList": TCSignal(clear_notification_list=True),
             "StopNotifications": TCSignal(stop_notifications=True),
             "AddToHintList": TCSignal(add_to_hint_list=True),
             "RemoveFromHintList": TCSignal(remove_from_hint_list=True),
             "ClearHintList": TCSignal(clear_hint_list=True),
-            "RPC": TCSignal(rpc=True)
+            "RPC": TCSignal(rpc=True, nested_completer_func=rpc_hint_callback(paths))
         }
         super().__init__(self._tc_signals)

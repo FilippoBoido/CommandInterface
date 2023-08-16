@@ -8,6 +8,7 @@ from prompt_toolkit.shortcuts import yes_no_dialog
 from pyads import ADSError
 from tabulate import tabulate
 from implementations.tc.data_classes import ConsoleArgs, Paths
+from implementations.tc.tc_types import validate_rpc_definitions
 from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
 from utilities.ads import (
     print_out_symbols,
@@ -17,7 +18,7 @@ from utilities.ads import (
     add_notification,
     set_symbol
 )
-from utilities.file import get_list_from_file, add_to_file, remove_from_file, get_json_dict
+from utilities.file import get_list_from_file, add_to_file, remove_from_file, get_json
 from signals.generic_signals import Signal
 import pyads
 
@@ -206,8 +207,11 @@ class TCSignalAnalyzer(SignalAnalyzer):
                                 print(f"Notification for {notification} symbol stopped")
 
             elif tc_signal.rpc:
-                rpc_definitions = get_json_dict(self._paths.rpc_definitions_file_path)
-                print(rpc_definitions)
+                rpc_definitions = get_json(self._paths.rpc_definitions_file_path)
+                if rpc_definitions:
+                    validate_rpc_definitions(rpc_definitions)
+                else:
+                    print(f"No rpc definitions or file {self._paths.rpc_definitions_file_path} found.")
 
         except ADSError as e:
             print_formatted_text(HTML(f'<red>ERR: {e}</red>'))
