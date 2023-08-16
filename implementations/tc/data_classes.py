@@ -24,7 +24,7 @@ class Paths:
     default_symbol_hints_file_path: ClassVar[str] = 'symbol_hint_file.txt'
     default_watchlist_file_path: ClassVar[str] = 'watchlist.txt'
     default_notification_symbols_file_path: ClassVar[str] = 'notification_list.txt'
-    default_ads_notifications_file_path: ClassVar[str] = 'ADSNotifications.txt'
+    default_ads_notifications_file_path: ClassVar[str] = 'ads_notifications.csv'
     default_config_file_path: ClassVar[str] = 'config.ini'
 
     def __post_init__(self):

@@ -1,3 +1,4 @@
+import csv
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
@@ -22,6 +23,8 @@ class Symbol:
     def __post_init__(self):
         self.index_group = hex(self.index_group)
         self.index_offset = hex(self.index_offset)
+
+
 def get_ads_symbol(plc: Connection, symbol_str):
     symbol = plc.get_symbol(symbol_str)
     if symbol.plc_type:
@@ -91,13 +94,10 @@ def add_notification(symbol, notification_dict, paths: Paths, callback=None):
                 else:
                     payload = notification_dict[symbol.name].value
 
-                # {notification_header.contents.data}
-                output_string = (
-                    f"{formatted_date_time}: Notification received for symbol {symbol.name}. "
-                    f"Value changed to: {payload}\n")
-
+                csv_output = [formatted_date_time, symbol.name, payload]
                 with open(paths.ads_notifications_file_path, 'a') as notification_file:
-                    notification_file.write(output_string)
+                    writer = csv.writer(notification_file)
+                    writer.writerow(csv_output)
 
             callback = _notification_callback
 
