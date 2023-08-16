@@ -20,7 +20,7 @@ class Signal(ABC):
         self.nested_completer_func = getter_func
 
 
-_initial_dict = {"Quit:": Signal(stop=True)}
+_initial_dict = {"Quit": Signal(stop=True)}
 
 
 class SignalDict(UserDict):

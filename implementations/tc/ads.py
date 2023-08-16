@@ -1,6 +1,7 @@
 import csv
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Union
 
 from pyads import Connection
 
@@ -16,8 +17,8 @@ class Symbol:
     symbol_type: str
     array_size: int
     auto_update: bool
-    index_group: int
-    index_offset: int
+    index_group: Union[int, str]
+    index_offset: Union[int, str]
     value: None
 
     def __post_init__(self):

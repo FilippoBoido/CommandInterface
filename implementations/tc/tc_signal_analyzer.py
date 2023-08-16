@@ -1,4 +1,3 @@
-import configparser
 import dataclasses
 import os
 from typing import Optional
@@ -10,7 +9,7 @@ from tabulate import tabulate
 from implementations.tc.data_classes import ConsoleArgs, Paths
 from implementations.tc.tc_types import validate_rpc_definitions
 from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
-from utilities.ads import (
+from implementations.tc.ads import (
     print_out_symbols,
     get_symbol_str,
     print_out_symbol,

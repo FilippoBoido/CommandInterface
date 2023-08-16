@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from implementations.tc.data_classes import Paths
 from signals.generic_signals import Signal, SignalDict
-from utilities.functions import symbol_hint_callback, rpc_hint_callback
+from implementations.tc.console_hints import symbol_hint_callback, rpc_hint_callback
 
 
 @dataclass
