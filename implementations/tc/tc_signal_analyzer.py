@@ -210,6 +210,20 @@ class TCSignalAnalyzer(SignalAnalyzer):
                 rpc_definitions = get_json(self._paths.rpc_definitions_file_path)
                 if rpc_definitions:
                     validate_rpc_definitions(rpc_definitions)
+
+                    if len(tc_signal.payload) >= 3:
+                        symbol_path, method_name, *args = tc_signal.payload
+                        print(symbol_path, method_name, args)
+
+                    elif len(tc_signal.payload) == 2:
+                        symbol_path, method_name = tc_signal.payload
+                        print(symbol_path, method_name)
+
+                    elif len(tc_signal.payload) == 1:
+                        print("RPC method name missing")
+
+                    else:
+                        print("Symbol path missing.")
                 else:
                     print(f"No rpc definitions or file {self._paths.rpc_definitions_file_path} found.")
 

@@ -34,6 +34,7 @@ class TCSignal(Signal):
 
 class TCSignalDict(SignalDict):
     def __init__(self, paths: Paths):
+        self.paths = paths
         self._tc_signals = {
             "GetAllSymbols": TCSignal(get_all_symbols=True),
             "GetSymbol": TCSignal(get_symbol=True, nested_completer_func=symbol_hint_callback(paths)),

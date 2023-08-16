@@ -20,6 +20,9 @@ class Paths:
     conf_file_notification_symbols: ClassVar[str] = 'notification_symbols'
     conf_file_ads_notifications: ClassVar[str] = 'ads_notifications'
     conf_file_rpc_definitions: ClassVar[str] = 'rpc_definitions'
+    conf_file_session_history: ClassVar[str] = 'session_history'
+
+    default_session_history_file_path: ClassVar[str] = 'session_history.txt'
     default_rpc_definitions_file_path: ClassVar[str] = 'rpc_definitions.json'
     default_ignore_ads_symbols_file_path: ClassVar[str] = 'ignore_ads_symbols.txt'
     default_symbol_hints_file_path: ClassVar[str] = 'symbol_hint_file.txt'
@@ -29,23 +32,34 @@ class Paths:
     default_config_file_path: ClassVar[str] = 'config.ini'
 
     def __post_init__(self):
+
         config = SilentConfigParser()
         config.read(self.path_to_config_file)
+
+        self.session_history_file_path = self._set_file_path(
+            config[Paths.conf_file_path_section][Paths.conf_file_session_history],
+            self.default_session_history_file_path)
+
         self.rpc_definitions_file_path = self._set_file_path(
             config[Paths.conf_file_path_section][Paths.conf_file_rpc_definitions],
             self.default_rpc_definitions_file_path)
+
         self.ignore_ads_symbols_file_path = self._set_file_path(
             config[Paths.conf_file_path_section][Paths.conf_file_ignore_ads_symbols],
             self.default_ignore_ads_symbols_file_path)
+
         self.symbol_hints_file_path = self._set_file_path(
             config[Paths.conf_file_path_section][Paths.conf_file_symbol_hints],
             self.default_symbol_hints_file_path)
+
         self.watchlist_file_path = self._set_file_path(
             config[Paths.conf_file_path_section][Paths.conf_file_watchlist],
             self.default_watchlist_file_path)
+
         self.notification_symbols_file_path = self._set_file_path(
             config[Paths.conf_file_path_section][Paths.conf_file_notification_symbols],
             self.default_notification_symbols_file_path)
+
         self.ads_notifications_file_path = self._set_file_path(
             config[Paths.conf_file_path_section][Paths.conf_file_ads_notifications],
             self.default_ads_notifications_file_path)
