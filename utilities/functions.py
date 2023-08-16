@@ -49,7 +49,9 @@ def show_notifications(file_path):
     process.terminate()
 
 
-def symbol_hint(paths: Paths) -> Optional[dict]:
-    hints = get_list_from_file(paths.symbol_hints_file_path)
-    if hints:
-        return dict([(entry, None) for entry in hints])
+def symbol_hint_callback(paths: Paths) -> Optional[dict]:
+    def symbol_hint():
+        hints = get_list_from_file(paths.symbol_hints_file_path)
+        if hints:
+            return dict([(entry, None) for entry in hints])
+    return symbol_hint

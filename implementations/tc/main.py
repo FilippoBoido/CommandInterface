@@ -43,7 +43,7 @@ async def app_loop(queue, signal_analyzer: SignalAnalyzer):
 
 async def main(args: ConsoleArgs):
     queue = asyncio.Queue()
-    tc_signal_dict = TCSignalDict()
+    tc_signal_dict = TCSignalDict(Paths(args.path_config))
     tc_signal_analyzer = TCSignalAnalyzer(args)
     await asyncio.gather(input_controller(queue, tc_signal_dict), app_loop(queue, tc_signal_analyzer))
 

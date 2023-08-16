@@ -17,7 +17,7 @@ from utilities.ads import (
     add_notification,
     set_symbol
 )
-from utilities.file import get_list_from_file, add_to_file, remove_from_file
+from utilities.file import get_list_from_file, add_to_file, remove_from_file, get_json_dict
 from signals.generic_signals import Signal
 import pyads
 
@@ -206,7 +206,8 @@ class TCSignalAnalyzer(SignalAnalyzer):
                                 print(f"Notification for {notification} symbol stopped")
 
             elif tc_signal.rpc:
-                ...
+                rpc_definitions = get_json_dict(self._paths.rpc_definitions_file_path)
+                print(rpc_definitions)
 
         except ADSError as e:
             print_formatted_text(HTML(f'<red>ERR: {e}</red>'))

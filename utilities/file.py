@@ -1,3 +1,4 @@
+import json
 import os
 
 
@@ -36,3 +37,9 @@ def remove_from_file(path_to_file, str_to_remove):
         with open(path_to_file, 'w') as file:
             for symbol_str in rebuilt_list:
                 file.write(symbol_str)
+
+
+def get_json_dict(path_to_file)->dict:
+    if os.path.isfile(path_to_file):
+        with open(path_to_file, 'r') as file:
+            return json.load(file)
