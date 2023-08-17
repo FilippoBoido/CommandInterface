@@ -217,8 +217,8 @@ class TCSignalAnalyzer(SignalAnalyzer):
                     except ValueError as e:
                         print(e)
 
-            else:
-                print(f"No rpc definitions or file {self._paths.rpc_definitions_file_path} found.")
+                else:
+                    print(f"No rpc definitions or file {self._paths.rpc_definitions_file_path} found.")
 
         except ADSError as e:
             print_formatted_text(HTML(f'<red>ERR: {e}</red>'))
