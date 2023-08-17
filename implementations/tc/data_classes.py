@@ -21,7 +21,9 @@ class Paths:
     conf_file_ads_notifications: ClassVar[str] = 'ads_notifications'
     conf_file_rpc_definitions: ClassVar[str] = 'rpc_definitions'
     conf_file_session_history: ClassVar[str] = 'session_history'
+    conf_file_recipe: ClassVar[str] = 'recipe'
 
+    default_recipe_file_path: ClassVar[str] = 'recipe.json'
     default_session_history_file_path: ClassVar[str] = 'session_history.txt'
     default_rpc_definitions_file_path: ClassVar[str] = 'rpc_definitions.json'
     default_ignore_ads_symbols_file_path: ClassVar[str] = 'ignore_ads_symbols.txt'
@@ -35,6 +37,10 @@ class Paths:
 
         config = SilentConfigParser()
         config.read(self.path_to_config_file)
+
+        self.recipe_file_path = self._set_file_path(
+            config[Paths.conf_file_path_section][Paths.conf_file_recipe],
+            self.default_recipe_file_path)
 
         self.session_history_file_path = self._set_file_path(
             config[Paths.conf_file_path_section][Paths.conf_file_session_history],

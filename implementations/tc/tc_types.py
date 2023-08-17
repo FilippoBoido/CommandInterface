@@ -1,5 +1,5 @@
 import json
-from typing import List
+from typing import List, Type
 
 from pyads import (
     PLCTYPE_INT,
@@ -33,6 +33,11 @@ class RPCDefinition(BaseModel):
     methods: List[RPCMethod]
 
 
+class RecipeDefinition(BaseModel):
+    symbol_path: str
+    value: any
+
+
 def raise_on_required_args(method: RPCMethod):
     arguments = method.arguments
     if arguments:
@@ -62,16 +67,17 @@ def find_rpc_method(method_name: str, methods: list[RPCMethod]) -> RPCMethod:
     raise ValueError(f'Method {method_name} not found in rpc methods')
 
 
-def validate_rpc_definitions(payload, silent=False):
+def validate_model_definitions(payload, model_class: Type[BaseModel],
+                               silent=False,
+                               on_error_schema_file_name='schema.json'):
     try:
-        return [RPCDefinition(**rpc_definition) for rpc_definition in payload]
+        return [model_class(**definition) for definition in payload]
     except ValidationError as e:
         if not silent:
             print(e)
-            schema_file_name = "rpc_definitions_schema.json"
-            with open(schema_file_name, 'w') as file:
-                json.dump(RPCDefinition.model_json_schema(), file, indent=4)
-            print(f"Schema file {schema_file_name} created to help in the creation of the rpc definition file.")
+            with open(on_error_schema_file_name, 'w') as file:
+                json.dump(model_class.model_json_schema(), file, indent=4)
+            print(f"Schema file {on_error_schema_file_name} created to help overcoming validation errors.")
 
 
 def get_plc_array_type(type_as_str: str):

@@ -7,7 +7,7 @@ from prompt_toolkit.shortcuts import yes_no_dialog
 from pyads import ADSError
 from tabulate import tabulate
 from implementations.tc.data_classes import ConsoleArgs, Paths
-from implementations.tc.tc_types import validate_rpc_definitions
+from implementations.tc.tc_types import validate_model_definitions
 from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
 from implementations.tc.ads import (
     print_out_symbols,
@@ -16,7 +16,7 @@ from implementations.tc.ads import (
     get_ads_symbol,
     add_notification,
     set_symbol,
-    signal_to_rpc_call
+    signal_to_rpc_call, download_recipe, upload_recipe
 )
 from utilities.file import get_list_from_file, add_to_file, remove_from_file, get_json
 from signals.generic_signals import Signal
@@ -209,7 +209,7 @@ class TCSignalAnalyzer(SignalAnalyzer):
             elif tc_signal.rpc:
                 rpc_definitions_json = get_json(self._paths.rpc_definitions_file_path)
                 if rpc_definitions_json:
-                    rpc_definitions = validate_rpc_definitions(rpc_definitions_json)
+                    rpc_definitions = validate_model_definitions(rpc_definitions_json)
                     if not rpc_definitions:
                         return
                     try:
@@ -219,6 +219,12 @@ class TCSignalAnalyzer(SignalAnalyzer):
 
                 else:
                     print(f"No rpc definitions or file {self._paths.rpc_definitions_file_path} found.")
+
+            elif tc_signal.download_recipe:
+                download_recipe(self._plc, self._paths.recipe_file_path)
+
+            elif tc_signal.upload_recipe:
+                upload_recipe(self._plc, self._paths.recipe_file_path)
 
         except ADSError as e:
             print_formatted_text(HTML(f'<red>ERR: {e}</red>'))

@@ -30,6 +30,8 @@ class TCSignal(Signal):
     remove_from_hint_list: bool = False
     clear_hint_list: bool = False
     rpc: bool = False
+    download_recipe: bool = False
+    upload_recipe: bool = False
 
 
 class TCSignalDict(SignalDict):
@@ -59,6 +61,8 @@ class TCSignalDict(SignalDict):
             "AddToHintList": TCSignal(add_to_hint_list=True),
             "RemoveFromHintList": TCSignal(remove_from_hint_list=True),
             "ClearHintList": TCSignal(clear_hint_list=True),
-            "RPC": TCSignal(rpc=True, nested_completer_func=rpc_hint_callback(paths))
+            "RPC": TCSignal(rpc=True, nested_completer_func=rpc_hint_callback(paths)),
+            "DownloadRecipe": TCSignal(download_recipe=True),
+            "UploadRecipe": TCSignal(download_recipe=True)
         }
         super().__init__(self._tc_signals)

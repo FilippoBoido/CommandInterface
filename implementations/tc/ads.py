@@ -1,16 +1,21 @@
 import csv
+import json
+import typing
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Union
+from typing import Union, Callable
 
 from pyads import Connection
 from pyads.constants import ADSIGRP_SYM_VALBYHND
+from pydantic import BaseModel
 
 from implementations.tc.data_classes import Paths
 from implementations.tc.tc_signals import TCSignal
 from implementations.tc.tc_types import get_plc_array_type, get_plc_type, raise_on_required_args, RPCMethod, \
-    RPCDefinition, find_rpc_definition, find_rpc_method, check_method_args_list_len
+    RPCDefinition, find_rpc_definition, find_rpc_method, check_method_args_list_len, RecipeDefinition, \
+    validate_model_definitions
 from signals.generic_signals import Signal
+from utilities.file import get_json
 from utilities.functions import payload_to_dataclass, fill_table
 
 
@@ -57,7 +62,42 @@ def get_symbol_str(signal: Signal) -> str:
     return symbol_str
 
 
-def rpc(plc, symbol, method: RPCMethod, args_datatype=None, args=None):
+def validate_recipe_and_execute_callback(file_path, callback: Callable[[list[BaseModel], dict], None]):
+    recipe_definitions_json = get_json(file_path)
+    if recipe_definitions_json:
+        recipe_definitions = validate_model_definitions(recipe_definitions_json, RecipeDefinition)
+        if not recipe_definitions:
+            return
+        callback(recipe_definitions, recipe_definitions_json)
+
+    else:
+        print(f"No recipe definitions found in {file_path}")
+
+
+def download_recipe(plc: Connection, file_path):
+    def callback(recipe_definitions: list[BaseModel], recipe_definitions_json: dict):
+        for recipe_definition in recipe_definitions:
+            plc.write_by_name(recipe_definition.symbol_path, recipe_definition.value)
+        print("Recipe downloaded successfully")
+
+    validate_recipe_and_execute_callback(file_path, callback)
+
+
+def upload_recipe(plc: Connection, file_path):
+    def callback(recipe_definitions: list[BaseModel], recipe_definitions_json: dict):
+        for i, recipe_definition in enumerate(recipe_definitions):
+            value = plc.read_by_name(recipe_definition.symbol_path)
+            recipe_definitions_json[i]['value'] = value
+
+        with open(file_path, 'w') as file:
+            json.dump(recipe_definitions_json, file, indent=4)
+
+        print("Recipe uploaded successfully")
+
+    validate_recipe_and_execute_callback(file_path, callback)
+
+
+def rpc(plc: Connection, symbol, method: RPCMethod, args_datatype=None, args=None):
     handle = plc.get_handle(symbol)
     return_types = method.return_types
     # FB has more than one return value, for example variables defined in the
