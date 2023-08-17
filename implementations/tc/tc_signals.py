@@ -63,6 +63,6 @@ class TCSignalDict(SignalDict):
             "ClearHintList": TCSignal(clear_hint_list=True),
             "RPC": TCSignal(rpc=True, nested_completer_func=rpc_hint_callback(paths)),
             "DownloadRecipe": TCSignal(download_recipe=True),
-            "UploadRecipe": TCSignal(download_recipe=True)
+            "UploadRecipe": TCSignal(upload_recipe=True)
         }
         super().__init__(self._tc_signals)
