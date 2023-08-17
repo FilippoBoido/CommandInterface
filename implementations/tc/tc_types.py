@@ -1,5 +1,6 @@
 import json
-from typing import List, Type
+from typing import List, Type, Any
+import numpy as np
 
 from pyads import (
     PLCTYPE_INT,
@@ -35,7 +36,7 @@ class RPCDefinition(BaseModel):
 
 class RecipeDefinition(BaseModel):
     symbol_path: str
-    value: any
+    value: Any
 
 
 def raise_on_required_args(method: RPCMethod):
@@ -82,6 +83,7 @@ def validate_model_definitions(payload, model_class: Type[BaseModel],
 
 def get_plc_array_type(type_as_str: str):
     try:
+        type_as_str = 'boolean' if type_as_str == 'bool' else type_as_str
         return PLC_ARRAY_MAP[type_as_str]
     except KeyError:
         raise ValueError(f"Wrong return type detected: {type_as_str}")
@@ -132,5 +134,42 @@ def get_plc_type(type_as_str: str):
             return PLCTYPE_REAL
         case 'char':
             return PLCTYPE_STRING
+        case _:
+            raise ValueError(f"Wrong return type detected: {type_as_str}")
+
+
+def convert_arg(arg, type_as_str: str):
+    match type_as_str:
+        case 'bool':
+            return bool(arg)
+        case 'byte':
+            if len(arg) != 2:
+                raise ValueError("Hex string should have exactly 2 characters")
+
+            byte_value = int(arg, 16)
+            # Keep only the lowest 8 bits
+            return byte_value & 0xFF
+        case 'int64':
+            return np.int64(arg)
+        case 'uint64':
+            return np.uint64(arg)
+        case 'uint32':
+            return np.uint32(arg)
+        case 'int32':
+            return np.int32(arg)
+        case 'int16':
+            return np.int16(arg)
+        case 'uint16':
+            return np.uint16(arg)
+        case 'int8':
+            return np.int8(arg)
+        case 'uint8':
+            return np.uint8(arg)
+        case 'double':
+            return np.real(arg)
+        case 'float':
+            return np.float(arg)
+        case 'char':
+            return arg
         case _:
             raise ValueError(f"Wrong return type detected: {type_as_str}")

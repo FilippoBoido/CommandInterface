@@ -1,6 +1,26 @@
 [
 	{
-		"symbol_path": "MAIN.fbTestRun.iCounter",
+		"symbol_path": "MAIN.recipe.iVar1",
 		"value": 10
+	},
+	{
+		"symbol_path": "MAIN.recipe.iVar2",
+		"value": 4
+	},
+	{
+		"symbol_path": "MAIN.recipe.bVar1",
+		"value": true
+	},
+	{
+		"symbol_path": "MAIN.recipe.rVar1",
+		"value": 10.5
+	},
+	{
+		"symbol_path": "MAIN.recipe.dVar1",
+		"value": 1000
+	},
+	{
+		"symbol_path": "MAIN.recipe.sVar1",
+		"value": "Filippo"
 	}
 ]

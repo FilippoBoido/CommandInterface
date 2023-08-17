@@ -7,7 +7,7 @@ from prompt_toolkit.shortcuts import yes_no_dialog
 from pyads import ADSError
 from tabulate import tabulate
 from implementations.tc.data_classes import ConsoleArgs, Paths
-from implementations.tc.tc_types import validate_model_definitions
+from implementations.tc.tc_types import validate_model_definitions, RPCDefinition
 from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
 from implementations.tc.ads import (
     print_out_symbols,
@@ -209,7 +209,7 @@ class TCSignalAnalyzer(SignalAnalyzer):
             elif tc_signal.rpc:
                 rpc_definitions_json = get_json(self._paths.rpc_definitions_file_path)
                 if rpc_definitions_json:
-                    rpc_definitions = validate_model_definitions(rpc_definitions_json)
+                    rpc_definitions = validate_model_definitions(rpc_definitions_json, RPCDefinition)
                     if not rpc_definitions:
                         return
                     try:

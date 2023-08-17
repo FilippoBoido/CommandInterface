@@ -8,7 +8,7 @@ from prompt_toolkit.history import FileHistory
 from implementations.tc.data_classes import ConsoleArgs, Paths
 from signal_analyzers.generic_signal_analyzers import SignalAnalyzer
 from implementations.tc.tc_signal_analyzer import TCSignalAnalyzer
-from signals.generic_signals import SignalDict, Signal
+from signals.generic_signals import Signal
 from implementations.tc.tc_signals import TCSignalDict, TCSignal
 
 

@@ -1,14 +1,31 @@
 [
 	{
-		"symbol_path": "MAIN.fbTestRun",
+		"symbol_path": "MAIN.rpc",
 		"methods": [
 			{
-				"name": "rpcMethod",
+				"name": "rpcMethod1Arg",
 				"arguments": [ 
+					{ "type": "bool", "required": "true"}
+				],
+				"return_types": ["bool"]
+			},
+			{
+				"name": "rpcMethod2Args",
+				"arguments": [
 					{ "type": "bool", "required": "true"},
 					{ "type": "bool", "required": "true"}
 				],
-				"return_types": ["int", "int"]
+				"return_types": ["bool", "bool"]
+			},
+			{
+				"name": "rpcMethodNoArgs",
+				"arguments": [],
+				"return_types": ["bool"]
+			},
+			{
+				"name": "rpcMethodNoArgsNoReturn",
+				"arguments": [],
+				"return_types": []
 			}
 		]
 	}

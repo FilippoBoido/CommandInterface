@@ -13,7 +13,7 @@ from implementations.tc.data_classes import Paths
 from implementations.tc.tc_signals import TCSignal
 from implementations.tc.tc_types import get_plc_array_type, get_plc_type, raise_on_required_args, RPCMethod, \
     RPCDefinition, find_rpc_definition, find_rpc_method, check_method_args_list_len, RecipeDefinition, \
-    validate_model_definitions
+    validate_model_definitions, convert_arg
 from signals.generic_signals import Signal
 from utilities.file import get_json
 from utilities.functions import payload_to_dataclass, fill_table
@@ -111,8 +111,9 @@ def rpc(plc: Connection, symbol, method: RPCMethod, args_datatype=None, args=Non
                               value=args)
     else:
 
-        raise_on_required_args(method)
-        return_type = get_plc_type(return_types[0])
+        return_type = None
+        if return_types:
+            return_type = get_plc_type(return_types[0])
         return plc.read_write(ADSIGRP_SYM_VALBYHND,
                               handle,
                               plc_read_datatype=return_type,
@@ -146,8 +147,10 @@ def signal_to_rpc_call(plc, tc_signal: TCSignal, rpc_definitions: list[RPCDefini
         rpc_definition = find_rpc_definition(rpc_definitions, symbol_path)
         method = find_rpc_method(method_name, rpc_definition.methods)
         check_method_args_list_len([arg], method)
-        arg_datatype = get_plc_type(method.arguments[0].type)
-        response = rpc(plc, symbol, method, arg_datatype, arg)
+        type_as_str = method.arguments[0].type
+        arg_datatype = get_plc_type(type_as_str)
+        value = convert_arg(arg, type_as_str)
+        response = rpc(plc, symbol, method, arg_datatype, value)
         if response:
             print(response)
 
@@ -159,11 +162,11 @@ def signal_to_rpc_call(plc, tc_signal: TCSignal, rpc_definitions: list[RPCDefini
         # Check if the arguments of the RPC-Method are required if any
         rpc_definition = find_rpc_definition(rpc_definitions, symbol_path)
         method = find_rpc_method(method_name, rpc_definition.methods)
+        raise_on_required_args(method)
 
         response = rpc(plc, symbol, method)
         if response:
             print(response)
-
 
     elif len(tc_signal.payload) == 1:
         raise ValueError("RPC method name missing")
