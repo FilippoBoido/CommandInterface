@@ -4,8 +4,12 @@ from datetime import datetime, timedelta
 from typing import Union
 
 from pyads import Connection
+from pyads.constants import ADSIGRP_SYM_VALBYHND
 
 from implementations.tc.data_classes import Paths
+from implementations.tc.tc_signals import TCSignal
+from implementations.tc.tc_types import get_plc_array_type, get_plc_type, raise_on_required_args, RPCMethod, \
+    RPCDefinition, find_rpc_definition, find_rpc_method, check_method_args_list_len
 from signals.generic_signals import Signal
 from utilities.functions import payload_to_dataclass, fill_table
 
@@ -51,6 +55,81 @@ def get_symbol_str(signal: Signal) -> str:
     symbol_str = signal.payload[0]
     signal.payload = None
     return symbol_str
+
+
+def rpc(plc, symbol, method: RPCMethod, args_datatype=None, args=None):
+    handle = plc.get_handle(symbol)
+    return_types = method.return_types
+    # FB has more than one return value, for example variables defined in the
+    # VAR_OUTPUT section
+    if len(return_types) > 1:
+        array_callable = get_plc_array_type(return_types[0])
+        return plc.read_write(ADSIGRP_SYM_VALBYHND,
+                              handle,
+                              plc_read_datatype=array_callable(len(return_types)),
+                              plc_write_datatype=args_datatype,
+                              value=args)
+    else:
+
+        raise_on_required_args(method)
+        return_type = get_plc_type(return_types[0])
+        return plc.read_write(ADSIGRP_SYM_VALBYHND,
+                              handle,
+                              plc_read_datatype=return_type,
+                              plc_write_datatype=args_datatype,
+                              value=args)
+
+
+def signal_to_rpc_call(plc, tc_signal: TCSignal, rpc_definitions: list[RPCDefinition]):
+    # The RPC-Method has more than 1 args
+    if len(tc_signal.payload) > 3:
+        symbol_path, method_name, *args = tc_signal.payload
+        symbol = symbol_path + '#' + method_name
+
+        rpc_definition = find_rpc_definition(rpc_definitions, symbol_path)
+        method = find_rpc_method(method_name, rpc_definition.methods)
+
+        # Check if len of args is the same as the number of RPC-Method args
+        check_method_args_list_len(args, method)
+        # Get PLC array type for method args
+        array_callable = get_plc_array_type(method.arguments[0].type)
+        args_datatype = array_callable(len(args))
+        response = rpc(plc, symbol, method, args_datatype, args)
+        if response:
+            print(response)
+
+    # The RPC-Method has 1 arg
+    elif len(tc_signal.payload) == 3:
+
+        symbol_path, method_name, arg = tc_signal.payload
+        symbol = symbol_path + '#' + method_name
+        rpc_definition = find_rpc_definition(rpc_definitions, symbol_path)
+        method = find_rpc_method(method_name, rpc_definition.methods)
+        check_method_args_list_len([arg], method)
+        arg_datatype = get_plc_type(method.arguments[0].type)
+        response = rpc(plc, symbol, method, arg_datatype, arg)
+        if response:
+            print(response)
+
+    # The RPC-Method has no arguments
+    elif len(tc_signal.payload) == 2:
+        symbol_path, method_name = tc_signal.payload
+        symbol = symbol_path + '#' + method_name
+
+        # Check if the arguments of the RPC-Method are required if any
+        rpc_definition = find_rpc_definition(rpc_definitions, symbol_path)
+        method = find_rpc_method(method_name, rpc_definition.methods)
+
+        response = rpc(plc, symbol, method)
+        if response:
+            print(response)
+
+
+    elif len(tc_signal.payload) == 1:
+        raise ValueError("RPC method name missing")
+
+    else:
+        raise ValueError("Symbol path missing.")
 
 
 def set_symbol(plc: Connection, symbol_str, value):

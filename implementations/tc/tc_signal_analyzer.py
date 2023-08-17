@@ -15,7 +15,8 @@ from implementations.tc.ads import (
     print_out_symbol,
     get_ads_symbol,
     add_notification,
-    set_symbol
+    set_symbol,
+    signal_to_rpc_call
 )
 from utilities.file import get_list_from_file, add_to_file, remove_from_file, get_json
 from signals.generic_signals import Signal
@@ -206,25 +207,18 @@ class TCSignalAnalyzer(SignalAnalyzer):
                                 print(f"Notification for {notification} symbol stopped")
 
             elif tc_signal.rpc:
-                rpc_definitions = get_json(self._paths.rpc_definitions_file_path)
-                if rpc_definitions:
-                    validate_rpc_definitions(rpc_definitions)
+                rpc_definitions_json = get_json(self._paths.rpc_definitions_file_path)
+                if rpc_definitions_json:
+                    rpc_definitions = validate_rpc_definitions(rpc_definitions_json)
+                    if not rpc_definitions:
+                        return
+                    try:
+                        signal_to_rpc_call(self._plc, tc_signal, rpc_definitions)
+                    except ValueError as e:
+                        print(e)
 
-                    if len(tc_signal.payload) >= 3:
-                        symbol_path, method_name, *args = tc_signal.payload
-                        print(symbol_path, method_name, args)
-
-                    elif len(tc_signal.payload) == 2:
-                        symbol_path, method_name = tc_signal.payload
-                        print(symbol_path, method_name)
-
-                    elif len(tc_signal.payload) == 1:
-                        print("RPC method name missing")
-
-                    else:
-                        print("Symbol path missing.")
-                else:
-                    print(f"No rpc definitions or file {self._paths.rpc_definitions_file_path} found.")
+            else:
+                print(f"No rpc definitions or file {self._paths.rpc_definitions_file_path} found.")
 
         except ADSError as e:
             print_formatted_text(HTML(f'<red>ERR: {e}</red>'))
