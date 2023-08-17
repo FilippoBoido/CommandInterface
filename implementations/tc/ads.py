@@ -1,6 +1,5 @@
 import csv
 import json
-import typing
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Union, Callable
@@ -218,7 +217,7 @@ def add_notification(symbol, notification_dict, paths: Paths, callback=None):
                     payload = notification_dict[symbol.name].value
 
                 csv_output = [formatted_date_time, symbol.name, payload]
-                with open(paths.ads_notifications_file_path, 'a') as notification_file:
+                with open(paths.ads_notifications_file_path, 'a', newline='') as notification_file:
                     writer = csv.writer(notification_file)
                     writer.writerow(csv_output)
 
