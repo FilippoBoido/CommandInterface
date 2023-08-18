@@ -11,7 +11,11 @@ from pyads import (
     PLCTYPE_REAL,
     PLCTYPE_SINT,
     PLCTYPE_STRING,
-    PLCTYPE_UDINT, PLCTYPE_UINT, PLCTYPE_USINT, PLCTYPE_LINT, PLCTYPE_ULINT
+    PLCTYPE_UDINT,
+    PLCTYPE_UINT,
+    PLCTYPE_USINT,
+    PLCTYPE_LINT,
+    PLCTYPE_ULINT
 )
 from pyads.constants import PLC_ARRAY_MAP
 
@@ -89,23 +93,6 @@ def get_plc_array_type(type_as_str: str):
         raise ValueError(f"Wrong return type detected: {type_as_str}")
 
 
-# PLCTYPE_BOOL = c_bool
-# PLCTYPE_BYTE = c_ubyte
-# PLCTYPE_DWORD = c_uint32
-# PLCTYPE_DINT = c_int32
-# PLCTYPE_INT = c_int16
-# PLCTYPE_LREAL = c_double
-# PLCTYPE_REAL = c_float
-# PLCTYPE_SINT = c_int8
-# PLCTYPE_STRING = c_char
-# PLCTYPE_TOD = c_int32
-# PLCTYPE_UBYTE = c_ubyte
-# PLCTYPE_UDINT = c_uint32
-# PLCTYPE_UINT = c_uint16
-# PLCTYPE_USINT = c_uint8
-# PLCTYPE_WORD = c_uint16
-# PLCTYPE_LINT = c_int64
-# PLCTYPE_ULINT = c_uint64
 def get_plc_type(type_as_str: str):
     match type_as_str:
         case 'bool':

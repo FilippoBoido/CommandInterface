@@ -18,7 +18,8 @@ def rpc_hint_callback(paths: Paths) -> Callable[[], dict[str, dict[str, None]]]:
     def rpc_hint():
         rpc_definitions_list = get_json(paths.rpc_definitions_file_path)
         if rpc_definitions_list:
-            rpc_definitions: list[RPCDefinition] = validate_model_definitions(rpc_definitions_list, RPCDefinition, silent=True)
+            rpc_definitions: list[RPCDefinition] = validate_model_definitions(rpc_definitions_list, RPCDefinition,
+                                                                              silent=True)
             if rpc_definitions:
                 return dict(
                     [(entry.symbol_path, dict([(method.name, None) for method in entry.methods])) for entry in
