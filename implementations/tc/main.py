@@ -63,7 +63,8 @@ async def main(args: ConsoleArgs):
 def console_args(ams_net_id, config_path, write_default_config):
     if write_default_config:
         Paths.write_default_config_file()
-        config_path = Paths.default_config_file_path
+        return
+
     asyncio.run(main(ConsoleArgs(ams_net_id, config_path)))
 
 

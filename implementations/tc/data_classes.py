@@ -83,6 +83,9 @@ class Paths:
             Paths.conf_file_watchlist: Paths.default_watchlist_file_path,
             Paths.conf_file_notification_symbols: Paths.default_notification_symbols_file_path,
             Paths.conf_file_ads_notifications: Paths.default_ads_notifications_file_path,
+            Paths.conf_file_rpc_definitions: Paths.default_rpc_definitions_file_path,
+            Paths.conf_file_session_history: Paths.default_session_history_file_path,
+            Paths.conf_file_recipe:Paths.default_recipe_file_path
         }
         with open(Paths.default_config_file_path, 'w') as configfile:
             config.write(configfile)
